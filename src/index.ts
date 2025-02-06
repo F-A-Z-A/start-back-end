@@ -42,7 +42,7 @@ app.get("/products/:id", (req: Request, res: Response) => {
   product ? res.send(product) : res.send(404);
 });
 
-app.get("/products/:id", (req: Request, res: Response) => {
+app.put("/products/:id", (req: Request, res: Response) => {
   const product = products.find((p) => p.id === +req.params.id);
   if (product) {
     product.title = req.body.title;
