@@ -1,36 +1,27 @@
 import { Request, Response, Router } from "express";
-
-const products = [
-  { id: 1, title: "tomato" },
-  { id: 2, title: "orange" },
-];
+import { productsRepository } from "../repositories/products-repository";
 
 export const productsRouter = Router({});
 
 productsRouter.get("/", (req: Request, res: Response) => {
-  if (req.query.title) {
-    const searchString = req.query.title.toString();
-    res.send(products.filter((p) => p.title.indexOf(searchString) > -1));
-  } else {
-    res.send(products);
-  }
+  const foundProducts = productsRepository.findProducts(req.query.title?.toString());
+  res.send(foundProducts);
 });
 
 productsRouter.post("/", (req: Request, res: Response) => {
-  const newProduct = { id: +new Date(), title: req.body.title };
-  products.push(newProduct);
+  const newProduct = productsRepository.createProduct(req.body.title);
   res.status(201).send(newProduct);
 });
 
 productsRouter.get("/:id", (req: Request, res: Response) => {
-  const product = products.find((p) => p.id === +req.params.id);
+  const product = productsRepository.findProductById(+req.params.id);
   product ? res.send(product) : res.send(404);
 });
 
 productsRouter.put("/:id", (req: Request, res: Response) => {
-  const product = products.find((p) => p.id === +req.params.id);
-  if (product) {
-    product.title = req.body.title;
+  const isUpdated = productsRepository.updateProduct(+req.params.id, req.body.title);
+  if (isUpdated) {
+    const product = productsRepository.findProductById(+req.params.id);
     res.send(product);
   } else {
     res.send(404);
@@ -38,12 +29,6 @@ productsRouter.put("/:id", (req: Request, res: Response) => {
 });
 
 productsRouter.delete("/:id", (req: Request, res: Response) => {
-  for (let i = 0; i < products.length; i++) {
-    if (products[i].id === +req.params.id) {
-      products.splice(i, 1);
-      res.send(204);
-      return;
-    }
-  }
-  res.send(404);
+  const isDeleted = productsRepository.deleteProduct(+req.params.id);
+  isDeleted ? res.send(204) : res.send(404);
 });
