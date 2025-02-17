@@ -2,21 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addressesRouter = void 0;
 const express_1 = require("express");
+const addresses_repository_1 = require("../repositories/addresses-repository");
 exports.addressesRouter = (0, express_1.Router)({});
-const addresses = [
-    { id: 1, value: "street-01" },
-    { id: 2, value: "street-02" },
-];
 exports.addressesRouter.get("/", (req, res) => {
-    if (req.query.title) {
-        const searchString = req.query.title.toString();
-        res.send(addresses.filter((p) => p.value.indexOf(searchString) > -1));
-    }
-    else {
-        res.send(addresses);
-    }
+    var _a;
+    const foundAddresses = addresses_repository_1.addressesRepository.findAddresses((_a = req.query.value) === null || _a === void 0 ? void 0 : _a.toString());
+    res.send(foundAddresses);
 });
 exports.addressesRouter.get("/:id", (req, res) => {
-    const address = addresses.find((a) => a.id === +req.params.id);
+    const address = addresses_repository_1.addressesRepository.findAddressById(+req.params.id);
     address ? res.send(address) : res.send(404);
 });
